@@ -1,0 +1,22 @@
+# Gradle
+.gradle/
+**/build/
+
+# Local Android SDK configuration
+local.properties
+
+# IntelliJ IDEA / Android Studio
+.idea/
+*.iml
+
+# Kotlin
+.kotlin/
+
+# macOS
+.DS_Store
+
+# Signing and publishing secrets
+*.gpg
+*.asc
+secring.gpg
+
