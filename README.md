@@ -1,10 +1,10 @@
-# SPI Framework
+# KSPindle
 
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.0+-blue)](https://kotlinlang.org)
 [![KSP](https://img.shields.io/badge/KSP-2.0.21--1.0.28-purple)](https://github.com/google/ksp)
 [![License](https://img.shields.io/badge/License-Apache%202.0-green)](LICENSE)
 
-# SPI 框架
+# KSPindle
 
 A compile-time, annotation-driven Service Provider Interface (SPI) framework for Kotlin and Android. Eliminates manual service registration -- annotate your implementations, let the KSP processor generate the wiring, and load services at runtime without classpath scanning.
 
@@ -52,8 +52,8 @@ plugins {
 }
 
 dependencies {
-    implementation("com.spi.framework:spi-core:1.0.0")
-    ksp("com.spi.framework:spi-compiler:1.0.0")
+    implementation("io.github.oayilix:kspindle-runtime:1.0.0")
+    ksp("io.github.oayilix:kspindle-compiler:1.0.0")
 }
 ```
 
@@ -62,20 +62,20 @@ dependencies {
 ### 3. 在运行时加载服务
 
 ```kotlin
-SpiLoader.initialize()
+Kspindle.initialize()
 
 // Highest-priority implementation
 // 获取最高优先级的实现
-val gateway: PaymentGateway = SpiLoader.load(PaymentGateway::class.java)
+val gateway: PaymentGateway = Kspindle.load(PaymentGateway::class.java)
 println(gateway.charge(49.99))
 
 // All implementations, sorted by priority
 // 获取所有实现，按优先级排序
-val all: List<PaymentGateway> = SpiLoader.loadAll(PaymentGateway::class.java)
+val all: List<PaymentGateway> = Kspindle.loadAll(PaymentGateway::class.java)
 
 // Named lookup
 // 按名称查找
-val paypal = SpiLoader.loadByName(PaymentGateway::class.java, "paypal")
+val paypal = Kspindle.loadByName(PaymentGateway::class.java, "paypal")
 ```
 
 ---
@@ -94,8 +94,8 @@ val paypal = SpiLoader.loadByName(PaymentGateway::class.java, "paypal")
 - **命名服务** —— 通过 `loadByName()` 按名称获取特定实现
 - **Lazy by default** -- implementations are instantiated on first access; opt into eager creation
 - **默认懒加载** —— 实现类在首次访问时实例化；可选择预创建
-- **Thread-safe** -- all `SpiLoader` and `ServiceRegistry` methods are safe for concurrent access
-- **线程安全** —— 所有 `SpiLoader` 和 `ServiceRegistry` 方法均支持并发访问
+- **Thread-safe** -- all `Kspindle` and `ServiceRegistry` methods are safe for concurrent access
+- **线程安全** —— 所有 `Kspindle` 和 `ServiceRegistry` 方法均支持并发访问
 - **Lightweight** -- no dependencies beyond Kotlin stdlib and the KSP API; single `ServiceLoader` discovery call
 - **轻量级** —— 除 Kotlin 标准库和 KSP API 外无其他依赖；仅需一次 `ServiceLoader` 发现调用
 - **Repeatable annotations** -- a single class can implement multiple service interfaces
@@ -109,9 +109,9 @@ val paypal = SpiLoader.loadByName(PaymentGateway::class.java, "paypal")
 
 | Module / 模块 | Artifact / 工件 | Description / 说明 |
 |---|---|---|
-| `spi-annotations` | `spi-annotations` | Contains `@ServiceProvider` and `@ServiceProviderInterface` annotations. Zero dependencies. / 包含 `@ServiceProvider` 和 `@ServiceProviderInterface` 注解。零依赖。 |
-| `spi-compiler` | `spi-compiler` | KSP symbol processor that discovers annotated classes and generates `ServiceIndexProvider` code. Required as a `ksp(...)` dependency. / KSP 符号处理器，发现注解类并生成 `ServiceIndexProvider` 代码。需要作为 `ksp(...)` 依赖添加。 |
-| `spi-core` | `spi-core` | Runtime library with `SpiLoader`, `ServiceRegistry`, and supporting types. Depends on `spi-annotations` (transitive via `api`). / 运行时库，包含 `SpiLoader`、`ServiceRegistry` 及支持类型。依赖于 `spi-annotations`（通过 `api` 传递）。 |
+| `kspindle-annotations` | `kspindle-annotations` | Contains `@ServiceProvider` and `@ServiceProviderInterface` annotations. Zero dependencies. / 包含 `@ServiceProvider` 和 `@ServiceProviderInterface` 注解。零依赖。 |
+| `kspindle-compiler` | `kspindle-compiler` | KSP symbol processor that discovers annotated classes and generates `ServiceIndexProvider` code. Required as a `ksp(...)` dependency. / KSP 符号处理器，发现注解类并生成 `ServiceIndexProvider` 代码。需要作为 `ksp(...)` 依赖添加。 |
+| `kspindle-runtime` | `kspindle-runtime` | Runtime library with `Kspindle`, `ServiceRegistry`, and supporting types. Depends on `kspindle-annotations` (transitive via `api`). / 运行时库，包含 `Kspindle`、`ServiceRegistry` 及支持类型。依赖于 `kspindle-annotations`（通过 `api` 传递）。 |
 
 ---
 
@@ -119,9 +119,9 @@ val paypal = SpiLoader.loadByName(PaymentGateway::class.java, "paypal")
 
 ## 架构解耦演示
 
-The SPI Framework enforces strict decoupling between modules. Business modules depend only on the API (`sample-api`), never on the implementation (`sample-impl`). The actual implementation class is discovered at runtime via the SPI mechanism.
+KSPindle enforces strict decoupling between modules. Business modules depend only on the API (`sample-api`), never on the implementation (`sample-impl`). The actual implementation class is discovered at runtime via the SPI mechanism.
 
-SPI 框架在模块之间强制执行严格的解耦。业务模块仅依赖于 API（`sample-api`），从不依赖于具体实现（`sample-impl`）。实际的实现类在运行时通过 SPI 机制发现。
+KSPindle 在模块之间强制执行严格的解耦。业务模块仅依赖于 API（`sample-api`），从不依赖于具体实现（`sample-impl`）。实际的实现类在运行时通过 SPI 机制发现。
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -162,8 +162,8 @@ SPI 框架在模块之间强制执行严格的解耦。业务模块仅依赖于 
 4. **`sample-impl` 模块** 提供实际的实现类，并使用 `@ServiceProvider` 注解标记。
 5. **At compile time**, the KSP processor in `sample-impl` generates a `ServiceIndexProvider` that maps the interface to the concrete class.
 6. **在编译时**，`sample-impl` 中的 KSP 处理器生成 `ServiceIndexProvider`，将接口映射到具体类。
-7. **At runtime**, `SpiLoader` discovers the generated index via `java.util.ServiceLoader` and instantiates the implementation on demand.
-8. **在运行时**，`SpiLoader` 通过 `java.util.ServiceLoader` 发现生成的索引，并按需实例化实现类。
+7. **At runtime**, `Kspindle` discovers the generated index via `java.util.ServiceLoader` and instantiates the implementation on demand.
+8. **在运行时**，`Kspindle` 通过 `java.util.ServiceLoader` 发现生成的索引，并按需实例化实现类。
 
 This means you can swap out `sample-impl` for a different implementation (e.g., a mock for testing, a platform-specific variant) without changing a single line of business code. The business module never has a compile-time dependency on the concrete implementation class.
 
@@ -187,13 +187,13 @@ plugins {
 }
 
 dependencies {
-    // Runtime library (includes spi-annotations transitively)
-    // 运行时库（传递包含 spi-annotations）
-    implementation("com.spi.framework:spi-core:1.0.0")
+    // Runtime library (includes kspindle-annotations transitively)
+    // 运行时库（传递包含 kspindle-annotations）
+    implementation("io.github.oayilix:kspindle-runtime:1.0.0")
 
     // KSP processor (compile-time only)
     // KSP 处理器（仅在编译时使用）
-    ksp("com.spi.framework:spi-compiler:1.0.0")
+    ksp("io.github.oayilix:kspindle-compiler:1.0.0")
 }
 ```
 
@@ -203,8 +203,8 @@ dependencies {
 
 ```kotlin
 dependencies {
-    implementation(project(":spi-core"))
-    ksp(project(":spi-compiler"))
+    implementation(project(":kspindle-runtime"))
+    ksp(project(":kspindle-compiler"))
 }
 ```
 

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SPI Framework Demo</string>
+    <string name="app_name">KSPindle Demo</string>
     <string name="description">Demonstrates the three SPI loading methods: load, loadAll, loadByName</string>
-    <string name="label_load">SpiLoader.load() (highest priority)</string>
-    <string name="label_load_all">SpiLoader.loadAll() (all implementations)</string>
-    <string name="label_load_by_name">SpiLoader.loadByName() (named lookup)</string>
+    <string name="label_load">Kspindle.load() (highest priority)</string>
+    <string name="label_load_all">Kspindle.loadAll() (all implementations)</string>
+    <string name="label_load_by_name">Kspindle.loadByName() (named lookup)</string>
     <string name="refresh">Refresh</string>
     <string name="format_load">Highest-priority: %s</string>
-    <string name="format_load_by_name">Name \"%s\": %s</string>
+    <string name="format_load_by_name">Name \"%1$s\": %2$s</string>
     <string name="format_not_found">Name \"%s\" not found</string>
     <string name="format_error">Error: %s</string>
 </resources>

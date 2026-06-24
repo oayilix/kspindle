@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.spi.sample"
+    namespace = "io.github.oayilix.kspindle.sample"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.spi.sample"
+        applicationId = "io.github.oayilix.kspindle.sample"
         minSdk = 26
         targetSdk = 35
         versionCode = 1
@@ -21,7 +21,7 @@ android {
             isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "../spi-core/consumer-rules.pro",
+                "../kspindle-runtime/consumer-rules.pro",
                 "proguard-rules.pro"
             )
         }
@@ -48,8 +48,8 @@ dependencies {
     // sample-impl provides implementations — available only at runtime, never at compile time
     runtimeOnly(project(":sample-impl"))
 
-    implementation(project(":spi-core"))
-    ksp(project(":spi-compiler"))
+    implementation(project(":kspindle-runtime"))
+    ksp(project(":kspindle-compiler"))
 
     implementation(libs.androidx.core)
     implementation(libs.androidx.appcompat)

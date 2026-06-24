@@ -7,5 +7,5 @@ kotlin {
 }
 
 dependencies {
-    api(project(":spi-annotations"))
+    api(project(":kspindle-annotations"))
 }

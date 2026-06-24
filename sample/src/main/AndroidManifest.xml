@@ -8,7 +8,7 @@
         android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
 
         <activity
-            android:name="com.spi.sample.MainActivity"
+            android:name="io.github.oayilix.kspindle.sample.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -15,11 +15,11 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "spi-framework"
+rootProject.name = "kspindle"
 
-include(":spi-annotations")
-include(":spi-compiler")
-include(":spi-core")
+include(":kspindle-annotations")
+include(":kspindle-compiler")
+include(":kspindle-runtime")
 include(":sample-api")
 include(":sample-impl")
 include(":sample")

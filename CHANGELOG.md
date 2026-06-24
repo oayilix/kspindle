@@ -1,20 +1,20 @@
 # Changelog / 变更日志
 
-All notable changes to the SPI Framework. / SPI 框架的所有重要变更。
+All notable changes to KSPindle. / KSPindle 的所有重要变更。
 
 ---
 
 ## [1.0.0] — Unreleased / 未发布
 
 ### Added / 新增
-- **Core SPI runtime** (`spi-core`): `SpiLoader`, `ServiceRegistry`, `RegistryEntry`, `ProviderRegistration`, `ServiceNotFoundException`.
-- **Annotations** (`spi-annotations`): `@ServiceProvider`, `@ServiceProviderInterface`, `ServiceFactory`.
-- **KSP compiler** (`spi-compiler`): `ServiceProviderProcessor` with validation, code generation, and `META-INF/services` discovery.
-- **Kotlin reified API**: `SpiLoader.load<T>()`, `loadAll<T>()`, `loadByName<T>(name)`, `isRegistered<T>()`.
+- **Core SPI runtime** (`kspindle-runtime`): `Kspindle`, `ServiceRegistry`, `RegistryEntry`, `ProviderRegistration`, `ServiceNotFoundException`.
+- **Annotations** (`kspindle-annotations`): `@ServiceProvider`, `@ServiceProviderInterface`, `ServiceFactory`.
+- **KSP compiler** (`kspindle-compiler`): `ServiceProviderProcessor` with validation, code generation, and `META-INF/services` discovery.
+- **Kotlin reified API**: `Kspindle.load<T>()`, `loadAll<T>()`, `loadByName<T>(name)`, `isRegistered<T>()`.
 - **Factory pattern**: `ServiceFactory<T>` interface for DI-friendly instantiation.
 - **Compile-time validation**: KSP checks for no-arg constructor when factory is not specified.
-- **Debug tooling**: `SpiLoader.dump()` and `ServiceRegistry.dump()` for registry inspection.
-- **ProGuard/R8 rules**: `consumer-rules.pro` shipped with `spi-core`.
+- **Debug tooling**: `Kspindle.dump()` and `ServiceRegistry.dump()` for registry inspection.
+- **ProGuard/R8 rules**: `consumer-rules.pro` shipped with `kspindle-runtime`.
 - **Thread safety**: `ConcurrentHashMap` + `CopyOnWriteArrayList` + double-checked locking + `@Volatile`.
 - **Multi-module sample**: `sample-api` / `sample-impl` / `sample` demonstrating SPI decoupling.
 - **Bilingual support**: All KDoc, comments, and documentation in Chinese + English. / 中英双语支持。
@@ -23,9 +23,9 @@ All notable changes to the SPI Framework. / SPI 框架的所有重要变更。
 ### Module Structure / 模块结构
 
 ```
-com.spi.framework:spi-annotations    — annotations
-com.spi.framework:spi-compiler       — KSP processor
-com.spi.framework:spi-core           — runtime
+io.github.oayilix:kspindle-annotations — annotations
+io.github.oayilix:kspindle-compiler    — KSP processor
+io.github.oayilix:kspindle-runtime     — runtime
 ```
 
 ### Requirements / 环境要求
@@ -42,9 +42,9 @@ com.spi.framework:spi-core           — runtime
 ## [0.4.0] — 2026-06-11
 
 ### Added / 新增
-- Debug `dump()` method on `SpiLoader` and `ServiceRegistry`.
+- Debug `dump()` method on `Kspindle` and `ServiceRegistry`.
 - `RegistryEntry.toString()` with initialization status, factory presence, and priority.
-- Sample `MainActivity` logs registry dump via `Log.d("SPI", SpiLoader.dump())`.
+- Sample `MainActivity` logs registry dump via `Log.d("SPI", Kspindle.dump())`.
 
 ---
 
@@ -53,7 +53,7 @@ com.spi.framework:spi-core           — runtime
 ### Added / 新增
 - `ServiceFactory<T>` interface and `factory` parameter on `@ServiceProvider`.
 - KSP compile-time no-arg constructor validation with clear error messages.
-- `consumer-rules.pro` shipped with `spi-core` for R8/ProGuard safety.
+- `consumer-rules.pro` shipped with `kspindle-runtime` for R8/ProGuard safety.
 - `docs/proguard.md` — setup guide for ProGuard/R8.
 
 ---
@@ -81,7 +81,7 @@ com.spi.framework:spi-core           — runtime
 - Initial release. / 初始版本。
 - `@ServiceProvider` and `@ServiceProviderInterface` annotations.
 - KSP `ServiceProviderProcessor` with code generation and `META-INF/services` discovery.
-- `SpiLoader` runtime entry point with `load()`, `loadAll()`, `loadByName()`, `isRegistered()`.
+- `Kspindle` runtime entry point with `load()`, `loadAll()`, `loadByName()`, `isRegistered()`.
 - `ServiceRegistry` thread-safe registry with priority ordering and lazy loading.
 - `RegistryEntry` with lazy/eager instantiation and thread-safe singleton.
 - `sample` Android app demonstrating SPI usage.
@@ -89,8 +89,8 @@ com.spi.framework:spi-core           — runtime
 
 ---
 
-[1.0.0]: https://github.com/oayilix/spi-framework/compare/v0.4.0...HEAD
-[0.4.0]: https://github.com/oayilix/spi-framework/compare/v0.3.0...v0.4.0
-[0.3.0]: https://github.com/oayilix/spi-framework/compare/v0.2.0...v0.3.0
-[0.2.0]: https://github.com/oayilix/spi-framework/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/oayilix/spi-framework/releases/tag/v0.1.0
+[1.0.0]: https://github.com/oayilix/kspindle/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/oayilix/kspindle/compare/v0.3.0...v0.4.0
+[0.3.0]: https://github.com/oayilix/kspindle/compare/v0.2.0...v0.3.0
+[0.2.0]: https://github.com/oayilix/kspindle/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/oayilix/kspindle/releases/tag/v0.1.0
