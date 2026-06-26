@@ -4,6 +4,11 @@ This document describes how maintainers verify and publish KSPindle artifacts.
 
 本文档说明维护者如何验证和发布 KSPindle SDK 产物。
 
+The current remote publishing target is GitHub Packages. Maven Central work is
+tracked separately in `TODO.md`.
+
+当前远端发布目标是 GitHub Packages。Maven Central 相关事项单独记录在 `TODO.md`。
+
 ## Published artifacts / 发布产物
 
 KSPindle publishes three Maven artifacts:
@@ -35,7 +40,7 @@ For release builds, override it from the command line or CI:
 正式发布时，通过命令行或 CI 覆盖版本：
 
 ```bash
-./gradlew publishToMavenLocal -PVERSION_NAME=0.5.0
+./gradlew publishAllPublicationsToLocalStagingRepository -PVERSION_NAME=0.5.0
 ```
 
 Tag releases should use the `vX.Y.Z` format, for example:
@@ -49,9 +54,9 @@ git push origin v0.5.0
 
 ## Local verification / 本地验证
 
-Before publishing remotely, run:
+Before publishing remotely, verify the SDK modules, sample app, and local Maven layout:
 
-远端发布前，先执行：
+远端发布前，先验证 SDK 模块、sample app 和本地 Maven 目录结构：
 
 ```bash
 ./gradlew test lintDebug :sample:assembleRelease
@@ -67,14 +72,13 @@ Before publishing remotely, run:
 
 `publishAllPublicationsToLocalStagingRepository` 会在根目录 `build/repo` 下生成 Maven 仓库结构，包括 JAR、源码包、javadoc 包、POM、Gradle metadata 和校验和。
 
-For the main maintainer workflow, the GitHub Actions `Publish SDK` workflow
-publishes to GitHub Packages and then verifies the sample against those published
-artifacts. If you need to debug the Maven layout before publishing, you can
-optionally point the sample at the local staging repository:
+The main maintainer workflow publishes to GitHub Packages first, then verifies
+the sample against those published artifacts. If you need to debug the generated
+Maven layout before publishing, optionally point the sample at the local staging
+repository:
 
-主维护流程中，GitHub Actions 的 `Publish SDK` workflow 会先发布到 GitHub
-Packages，再用已发布产物验证 sample。如果需要在发布前调试 Maven 目录结构，可以选择让
-sample 指向本地 staging 仓库：
+主维护流程会先发布到 GitHub Packages，再用已发布产物验证 sample。如果需要在发布前调试生成的
+Maven 目录结构，可以选择让 sample 指向本地 staging 仓库：
 
 ```bash
 ./gradlew publishAllPublicationsToLocalStagingRepository \
@@ -84,23 +88,6 @@ sample 指向本地 staging 仓库：
   -PusePublishedKspindle=true \
   -PkspindleVersion=0.5.0-SNAPSHOT \
   -PkspindleRepositoryUrl="$PWD/build/repo"
-```
-
-To verify against GitHub Packages directly:
-
-如需直接验证 GitHub Packages 上的产物：
-
-```bash
-GITHUB_ACTOR=<github-username> \
-GITHUB_PACKAGES_TOKEN=<github-token-with-read-packages> \
-GRADLE_USER_HOME="$(mktemp -d)" \
-./gradlew clean \
-  :sample:assembleRelease \
-  :sample-impl:kspKotlin \
-  -PusePublishedKspindle=true \
-  -PkspindleVersion=0.5.0-SNAPSHOT \
-  --refresh-dependencies \
-  --rerun-tasks
 ```
 
 ## GitHub Packages publishing / 发布到 GitHub Packages
@@ -126,6 +113,12 @@ The workflow uses the built-in `GITHUB_TOKEN`, so the repository must grant work
 
 该 workflow 使用内置 `GITHUB_TOKEN`，仓库需要允许 workflow 写入 Packages。
 
+After publishing, the workflow verifies the sample against the GitHub Packages
+artifacts with an isolated Gradle cache and refreshed dependencies.
+
+发布完成后，workflow 会使用隔离的 Gradle 缓存和刷新后的依赖，验证 sample 可以消费
+GitHub Packages 上的产物。
+
 ### Publish from a local machine / 从本机发布
 
 Create a GitHub token with package write permission, then run:
@@ -147,6 +140,25 @@ Alternatively, provide credentials with environment variables:
 GITHUB_ACTOR=<github-username> \
 GITHUB_PACKAGES_TOKEN=<github-token> \
 ./gradlew publishAllPublicationsToGitHubPackagesRepository -PVERSION_NAME=0.5.0
+```
+
+### Verify published artifacts / 验证已发布产物
+
+After publishing, verify the artifacts from GitHub Packages directly:
+
+发布后，可直接验证 GitHub Packages 上的产物：
+
+```bash
+GITHUB_ACTOR=<github-username> \
+GITHUB_PACKAGES_TOKEN=<github-token-with-read-packages> \
+GRADLE_USER_HOME="$(mktemp -d)" \
+./gradlew clean \
+  :sample:assembleRelease \
+  :sample-impl:kspKotlin \
+  -PusePublishedKspindle=true \
+  -PkspindleVersion=0.5.0-SNAPSHOT \
+  --refresh-dependencies \
+  --rerun-tasks
 ```
 
 ## Consuming from GitHub Packages / 从 GitHub Packages 消费
@@ -181,23 +193,11 @@ dependencies {
 }
 ```
 
-## Maven Central future work / Maven Central 后续工作
+## GitHub Packages release checklist / GitHub Packages 发布检查清单
 
-GitHub Packages is the first remote publishing target. Maven Central still needs:
+Before cutting a GitHub Packages release:
 
-GitHub Packages 是当前第一个远端发布目标。Maven Central 还需要：
-
-- Sonatype Central Portal namespace ownership for `io.github.oayilix`;
-- release repository configuration;
-- signing key provisioning in CI;
-- close/release workflow validation;
-- final release checklist.
-
-## Release checklist / 发布检查清单
-
-Before cutting a release:
-
-发布前确认：
+发布到 GitHub Packages 前确认：
 
 - `VERSION_NAME` or `-PVERSION_NAME` matches the tag;
 - `CHANGELOG.md` documents the release;
