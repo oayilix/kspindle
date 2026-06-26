@@ -48,12 +48,25 @@ class PayPalGateway : PaymentGateway {
 ```kotlin
 // build.gradle.kts (module-level / 模块级别)
 plugins {
-    id("org.jetbrains.kotlin.plugin.ksp")
+    id("com.google.devtools.ksp")
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url = uri("https://maven.pkg.github.com/oayilix/kspindle")
+        credentials {
+            username = providers.gradleProperty("gpr.user").orNull
+                ?: System.getenv("GITHUB_ACTOR")
+            password = providers.gradleProperty("gpr.key").orNull
+                ?: System.getenv("GITHUB_PACKAGES_TOKEN")
+        }
+    }
 }
 
 dependencies {
-    implementation("io.github.oayilix:kspindle-runtime:1.0.0")
-    ksp("io.github.oayilix:kspindle-compiler:1.0.0")
+    implementation("io.github.oayilix:kspindle-runtime:0.5.0")
+    ksp("io.github.oayilix:kspindle-compiler:0.5.0")
 }
 ```
 
@@ -179,6 +192,10 @@ Add the following to your module-level `build.gradle.kts`:
 
 将以下内容添加到模块级别的 `build.gradle.kts` 中：
 
+KSPindle is currently published to GitHub Packages, so make sure the GitHub Packages repository is configured as shown in the Quick Start section above.
+
+KSPindle 当前发布到 GitHub Packages，请确保已按上方快速开始示例配置 GitHub Packages 仓库。
+
 ```kotlin
 plugins {
     // Required: KSP plugin
@@ -189,11 +206,11 @@ plugins {
 dependencies {
     // Runtime library (includes kspindle-annotations transitively)
     // 运行时库（传递包含 kspindle-annotations）
-    implementation("io.github.oayilix:kspindle-runtime:1.0.0")
+    implementation("io.github.oayilix:kspindle-runtime:0.5.0")
 
     // KSP processor (compile-time only)
     // KSP 处理器（仅在编译时使用）
-    ksp("io.github.oayilix:kspindle-compiler:1.0.0")
+    ksp("io.github.oayilix:kspindle-compiler:0.5.0")
 }
 ```
 

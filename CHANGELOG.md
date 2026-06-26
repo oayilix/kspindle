@@ -4,7 +4,7 @@ All notable changes to KSPindle. / KSPindle 的所有重要变更。
 
 ---
 
-## [1.0.0] — Unreleased / 未发布
+## [0.5.0] — Unreleased / 未发布
 
 ### Added / 新增
 - **Core SPI runtime** (`kspindle-runtime`): `Kspindle`, `ServiceRegistry`, `RegistryEntry`, `ProviderRegistration`, `ServiceNotFoundException`.
@@ -14,11 +14,11 @@ All notable changes to KSPindle. / KSPindle 的所有重要变更。
 - **Factory pattern**: `ServiceFactory<T>` interface for DI-friendly instantiation.
 - **Compile-time validation**: KSP checks for no-arg constructor when factory is not specified.
 - **Debug tooling**: `Kspindle.dump()` and `ServiceRegistry.dump()` for registry inspection.
-- **ProGuard/R8 rules**: `consumer-rules.pro` shipped with `kspindle-runtime`.
+- **ProGuard/R8 rules**: `consumer-rules.pro` shipped in `kspindle-runtime` under `META-INF/proguard/`.
 - **Thread safety**: `ConcurrentHashMap` + `CopyOnWriteArrayList` + double-checked locking + `@Volatile`.
 - **Multi-module sample**: `sample-api` / `sample-impl` / `sample` demonstrating SPI decoupling.
 - **Bilingual support**: All KDoc, comments, and documentation in Chinese + English. / 中英双语支持。
-- **Test suite**: 103 unit tests including concurrency stress tests and edge cases.
+- **Test suite**: 106 unit tests including concurrency stress tests and edge cases.
 
 ### Module Structure / 模块结构
 
@@ -75,22 +75,7 @@ io.github.oayilix:kspindle-runtime     — runtime
 
 ---
 
-## [0.1.0] — 2026-06-11
-
-### Added / 新增
-- Initial release. / 初始版本。
-- `@ServiceProvider` and `@ServiceProviderInterface` annotations.
-- KSP `ServiceProviderProcessor` with code generation and `META-INF/services` discovery.
-- `Kspindle` runtime entry point with `load()`, `loadAll()`, `loadByName()`, `isRegistered()`.
-- `ServiceRegistry` thread-safe registry with priority ordering and lazy loading.
-- `RegistryEntry` with lazy/eager instantiation and thread-safe singleton.
-- `sample` Android app demonstrating SPI usage.
-- 88 unit tests for core runtime.
-
----
-
-[1.0.0]: https://github.com/oayilix/kspindle/compare/v0.4.0...HEAD
+[0.5.0]: https://github.com/oayilix/kspindle/compare/v0.4.0...HEAD
 [0.4.0]: https://github.com/oayilix/kspindle/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/oayilix/kspindle/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/oayilix/kspindle/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/oayilix/kspindle/releases/tag/v0.1.0

@@ -76,15 +76,34 @@ plugins {
 
 ### 步骤 2：添加 KSPindle 依赖
 
+KSPindle is currently published to GitHub Packages. Add the repository before declaring dependencies:
+
+KSPindle 当前发布到 GitHub Packages。声明依赖前需要添加仓库：
+
+```kotlin
+repositories {
+    mavenCentral()
+    maven {
+        url = uri("https://maven.pkg.github.com/oayilix/kspindle")
+        credentials {
+            username = providers.gradleProperty("gpr.user").orNull
+                ?: System.getenv("GITHUB_ACTOR")
+            password = providers.gradleProperty("gpr.key").orNull
+                ?: System.getenv("GITHUB_PACKAGES_TOKEN")
+        }
+    }
+}
+```
+
 ```kotlin
 dependencies {
     // Runtime library (includes kspindle-annotations transitively)
     // 运行时库（传递包含 kspindle-annotations）
-    implementation("io.github.oayilix:kspindle-runtime:1.0.0")
+    implementation("io.github.oayilix:kspindle-runtime:0.5.0")
 
     // Compile-time annotation processor
     // 编译时注解处理器
-    ksp("io.github.oayilix:kspindle-compiler:1.0.0")
+    ksp("io.github.oayilix:kspindle-compiler:0.5.0")
 }
 ```
 
@@ -427,7 +446,7 @@ if (spanish != null) {
     println(spanish.greet()) // "Hola"
 }
 
-val unknown: GreetingService? = Kspindle.loadByName(GreetingService::class.java, "french")
+val unknown: GreetingService? = Kspindle.loadByName(GreetingService::class.java, "unknown")
 println(unknown) // null -- no error thrown / null —— 不会抛出错误
 ```
 
@@ -870,28 +889,28 @@ KSPindle 从一开始就设计为支持并发访问。
 
 ### `java.lang.NoSuchMethodException: ...<init>()`
 
-**Cause:** The service implementation class does not have a public no-argument constructor. `RegistryEntry.createInstance()` uses `constructor.newInstance()` via reflection, which requires a public no-arg constructor.
+**Cause:** The service implementation class does not have a no-argument constructor compatible with reflective instantiation. `RegistryEntry.createInstance()` uses a declared no-arg constructor via reflection.
 
-**原因：** 服务实现类没有公共无参构造函数。`RegistryEntry.createInstance()` 通过反射使用 `constructor.newInstance()`，这需要一个公共无参构造函数。
+**原因：** 服务实现类没有无参构造函数。`RegistryEntry.createInstance()` 通过反射使用无参构造函数创建实例。
 
-**Solution:** Add a public no-argument constructor to your implementation class. If your class uses constructor injection, you need to either:
-**解决方法：** 为你的实现类添加公共无参构造函数。如果你的类使用构造函数注入，你需要：
+**Solution:** Add a no-argument constructor to your implementation class. If your class uses constructor injection, you need to either:
+**解决方法：** 为你的实现类添加无参构造函数。如果你的类使用构造函数注入，你需要：
 
 - Add a no-arg constructor, or
 - 添加无参构造函数，或者
 - Register the service programmatically via `Kspindle.getRegistry().register()` with a pre-built instance (future feature).
 - 通过 `Kspindle.getRegistry().register()` 使用预构建实例以编程方式注册服务（未来特性）。
 
-### KSP processor warnings: "Could not create META-INF/services file"
+### KSP processor error: "Could not create META-INF/services file"
 
-### KSP 处理器警告："无法创建 META-INF/services 文件"
+### KSP 处理器错误："无法创建 META-INF/services 文件"
 
-**Cause:** The processor attempts to write the `ServiceLoader` descriptor file redundantly across incremental compilation rounds. This warning is benign -- the file is created on the first processing round and subsequent attempts are safely skipped.
+**Cause:** The processor could not write the `ServiceLoader` descriptor file required for runtime discovery. This is a build-breaking error because the SDK cannot reliably discover generated providers without this file.
 
-**原因：** 处理器在增量编译轮次中尝试冗余写入 `ServiceLoader` 描述符文件。此警告是良性的 —— 文件在首次处理轮次中创建，后续尝试会被安全跳过。
+**原因：** 处理器无法写入运行时发现所需的 `ServiceLoader` 描述符文件。缺少该文件时 SDK 无法可靠发现生成的 provider，因此这是会中断构建的错误。
 
-**Action:** Ignore this warning. If it causes build failures, ensure `Dependencies(aggregating = true)` is used in the `createNewFileByPath` call (it already is in the default implementation).
-**操作：** 忽略此警告。如果它导致构建失败，请确保在 `createNewFileByPath` 调用中使用 `Dependencies(aggregating = true)`（默认实现中已经如此）。
+**Action:** Clean and rebuild the project. If the error persists, capture the full KSP error output and file an issue with a minimal reproduction.
+**操作：** 清理并重新构建项目。如果错误仍然存在，请保留完整 KSP 错误输出，并提交最小复现。
 
 ### Migrating from Java `ServiceLoader`
 

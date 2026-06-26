@@ -177,11 +177,11 @@ class ServiceProviderProcessor(
             // Validate: if no factory is specified, non-object implementations must have a no-arg constructor.
             // 验证：如果没有指定工厂，非 object 实现类必须有一个无参构造函数。
             if (!usesFactory && !isObject) {
-                val primaryCtor = declaration.primaryConstructor
-                if (primaryCtor != null && primaryCtor.parameters.isNotEmpty()) {
+                val hasNoArgConstructor = hasNoArgConstructor(declaration)
+                if (!hasNoArgConstructor) {
                     logger.error(
-                        "'$implQualifiedName' has constructor parameters but no factory specified. " +
-                        "Either add a no-arg constructor or provide a ServiceFactory via the 'factory' parameter. " +
+                        "'$implQualifiedName' does not declare a no-arg constructor and no factory is specified. " +
+                        "Either add a no-arg primary/secondary constructor or provide a ServiceFactory via the 'factory' parameter. " +
                         "要么添加无参构造函数，要么通过 'factory' 参数提供 ServiceFactory。",
                         declaration
                     )
@@ -204,6 +204,27 @@ class ServiceProviderProcessor(
         }
 
         return results
+    }
+
+    /**
+     * Check whether [classDecl] has a constructor compatible with [Class.getDeclaredConstructor].
+     * KSP exposes the primary constructor directly, while secondary constructors are available as
+     * declarations named "<init>".
+     *
+     * 检查 [classDecl] 是否存在可被 [Class.getDeclaredConstructor] 使用的无参构造函数。
+     * KSP 会直接暴露 primary constructor，secondary constructor 则以名为 "<init>" 的声明出现。
+     */
+    private fun hasNoArgConstructor(classDecl: KSClassDeclaration): Boolean {
+        val primaryCtor = classDecl.primaryConstructor
+        if (primaryCtor == null || primaryCtor.parameters.isEmpty()) {
+            return true
+        }
+
+        return classDecl.declarations
+            .filterIsInstance<KSFunctionDeclaration>()
+            .any { declaration ->
+                declaration.simpleName.asString() == "<init>" && declaration.parameters.isEmpty()
+            }
     }
 
     /**
@@ -285,8 +306,8 @@ class ServiceProviderProcessor(
             val comment = "        // --- Registration: ${serviceName.substringAfterLast('.')} ---"
             val anyObject = impls.any { it.isObject && it.factoryQualifiedName == null }
             val noArgComment = if (!anyFactory && !anyObject) {
-                "        // IMPORTANT: Each implementation class MUST have a public no-argument constructor.\n" +
-                        "        // 重要：每个实现类必须有一个公开的无参构造函数。"
+                "        // IMPORTANT: Each implementation class MUST have a no-argument constructor.\n" +
+                        "        // 重要：每个实现类必须有一个无参构造函数。"
             } else {
                 "        // NOTE: Some providers use a ServiceFactory or Kotlin object singleton for instantiation.\n" +
                         "        // 注意：部分提供者使用 ServiceFactory 或 Kotlin object 单例进行实例化。"
@@ -374,7 +395,7 @@ class ServiceProviderProcessor(
                 writer.write("$serviceLine\n")
             }
         } catch (e: Exception) {
-            logger.warn("[KSPindle Processor] Could not create META-INF/services file: ${e.message}")
+            logger.error("[KSPindle Processor] Could not create META-INF/services file: ${e.message}")
         }
     }
 }

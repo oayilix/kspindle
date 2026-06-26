@@ -22,6 +22,7 @@ import io.github.oayilix.kspindle.annotations.ServiceProviderInterface
  *
  * @see io.github.oayilix.kspindle.sample.impl.EnglishGreeting
  * @see io.github.oayilix.kspindle.sample.impl.SpanishGreeting
+ * @see io.github.oayilix.kspindle.sample.impl.FrenchGreeting
  */
 @ServiceProviderInterface(name = "Greeting Service")
 interface GreetingService {

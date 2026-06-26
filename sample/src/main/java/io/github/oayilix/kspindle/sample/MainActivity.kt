@@ -102,13 +102,33 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
                 tvLoadByNameResult.text = getString(R.string.format_not_found, "spanish")
             }
 
+            // Step 5: Demonstrate another named implementation with a no-arg secondary constructor.
+            // 步骤 5: 演示另一个带无参 secondary constructor 的命名实现。
+            val french: GreetingService? = Kspindle.loadByName(
+                GreetingService::class.java,
+                "french"
+            )
+            if (french != null) {
+                tvLoadByNameResult.append(
+                    "\n" + getString(
+                        R.string.format_load_by_name,
+                        "french",
+                        french.greet()
+                    )
+                )
+            }
+
             // Also demonstrate loading by a non-existent name.
             // 同时演示按不存在的名称加载。
             val unknown: GreetingService? = Kspindle.loadByName(
                 GreetingService::class.java,
-                "french"
+                "unknown"
             )
-            tvLoadResult.append("\n(" + getString(R.string.format_not_found, "french") + ")")
+            if (unknown == null) {
+                tvLoadByNameResult.append(
+                    "\n(" + getString(R.string.format_not_found, "unknown") + ")"
+                )
+            }
 
         } catch (e: ServiceNotFoundException) {
             tvError.text = getString(R.string.format_error, e.message ?: e.toString())
