@@ -67,25 +67,23 @@ Before publishing remotely, run:
 
 `publishAllPublicationsToLocalStagingRepository` 会在根目录 `build/repo` 下生成 Maven 仓库结构，包括 JAR、源码包、javadoc 包、POM、Gradle metadata 和校验和。
 
-To verify the sample against local staging artifacts instead of local project dependencies:
+For the main maintainer workflow, the GitHub Actions `Publish SDK` workflow
+publishes to GitHub Packages and then verifies the sample against those published
+artifacts. If you need to debug the Maven layout before publishing, you can
+optionally point the sample at the local staging repository:
 
-如需让 sample 使用本地 staging 仓库里的 Maven 产物，而不是本地 project 依赖：
+主维护流程中，GitHub Actions 的 `Publish SDK` workflow 会先发布到 GitHub
+Packages，再用已发布产物验证 sample。如果需要在发布前调试 Maven 目录结构，可以选择让
+sample 指向本地 staging 仓库：
 
 ```bash
 ./gradlew publishAllPublicationsToLocalStagingRepository \
   -PVERSION_NAME=0.5.0-SNAPSHOT
 
-GRADLE_USER_HOME="$(mktemp -d)" \
-./gradlew :sample:clean \
-  :sample-api:clean \
-  :sample-impl:clean \
-  :sample:assembleRelease \
-  :sample-impl:kspKotlin \
+./gradlew :sample:assembleRelease :sample-impl:kspKotlin \
   -PusePublishedKspindle=true \
   -PkspindleVersion=0.5.0-SNAPSHOT \
-  -PkspindleRepositoryUrl="$PWD/build/repo" \
-  --refresh-dependencies \
-  --rerun-tasks
+  -PkspindleRepositoryUrl="$PWD/build/repo"
 ```
 
 To verify against GitHub Packages directly:

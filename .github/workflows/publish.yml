@@ -54,11 +54,6 @@ jobs:
       - name: Verify publishable artifacts
         run: ./gradlew test lintDebug :sample:assembleRelease :kspindle-runtime:checkConsumerProguardRulesInJar publishAllPublicationsToLocalStagingRepository -PVERSION_NAME=${{ steps.version.outputs.version }}
 
-      - name: Verify sample consumes local staging artifacts
-        env:
-          GRADLE_USER_HOME: ${{ runner.temp }}/gradle-local-staging-verify
-        run: ./gradlew :sample:clean :sample-api:clean :sample-impl:clean :sample:assembleRelease :sample-impl:kspKotlin -PusePublishedKspindle=true -PkspindleVersion=${{ steps.version.outputs.version }} -PkspindleRepositoryUrl=${{ github.workspace }}/build/repo --refresh-dependencies --rerun-tasks
-
       - name: Publish to GitHub Packages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
