@@ -4,12 +4,8 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
-val usePublishedKspindle = providers.gradleProperty("usePublishedKspindle")
-    .map(String::toBoolean)
-    .getOrElse(false)
-val kspindleVersion = providers.gradleProperty("kspindleVersion")
-    .orElse(providers.gradleProperty("VERSION_NAME"))
-    .get()
+val usePublishedKspindle = rootProject.extra["kspindleSampleUsePublishedArtifacts"] as Boolean
+val kspindleVersion = rootProject.extra["kspindleSampleVersion"] as String
 
 android {
     namespace = "io.github.oayilix.kspindle.sample"

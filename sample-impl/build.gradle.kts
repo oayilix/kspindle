@@ -7,12 +7,8 @@ kotlin {
     jvmToolchain(17)
 }
 
-val usePublishedKspindle = providers.gradleProperty("usePublishedKspindle")
-    .map(String::toBoolean)
-    .getOrElse(false)
-val kspindleVersion = providers.gradleProperty("kspindleVersion")
-    .orElse(providers.gradleProperty("VERSION_NAME"))
-    .get()
+val usePublishedKspindle = rootProject.extra["kspindleSampleUsePublishedArtifacts"] as Boolean
+val kspindleVersion = rootProject.extra["kspindleSampleVersion"] as String
 
 dependencies {
     implementation(project(":sample-api"))

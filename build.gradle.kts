@@ -17,6 +17,18 @@ val sdkProjects = mapOf(
     "kspindle-compiler" to "KSPindle KSP compiler"
 )
 
+// Sample modules can be switched from local project dependencies to published Maven artifacts
+// for post-publish verification. Keep the property parsing centralized so all sample modules
+// resolve the same mode and version.
+// sample 模块可在发布后验证时从本地 project 依赖切换到 Maven 坐标依赖；
+// 这里集中解析开关和版本，避免多个 sample 模块各自取值导致不一致。
+extra["kspindleSampleUsePublishedArtifacts"] = providers.gradleProperty("usePublishedKspindle")
+    .map(String::toBoolean)
+    .getOrElse(false)
+extra["kspindleSampleVersion"] = providers.gradleProperty("kspindleVersion")
+    .orElse(providers.gradleProperty("VERSION_NAME"))
+    .get()
+
 subprojects {
     // Only the three public SDK modules are published. Sample/demo modules stay private to this repo.
     // 仅发布三个对外 SDK 模块；示例模块只用于仓库内验证，不进入 Maven 坐标。
