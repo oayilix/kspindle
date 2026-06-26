@@ -90,11 +90,14 @@ subprojects {
 
         repositories {
             maven {
-                // Local staging repository for inspecting the exact Maven layout before wiring
-                // a remote repository such as Maven Central or GitHub Packages.
-                // 本地 staging 仓库用于检查最终 Maven 目录结构；之后可替换/扩展到远端仓库。
+                // Local staging repository for inspecting and consuming the exact Maven layout
+                // before wiring a remote repository such as Maven Central or GitHub Packages.
+                // Use a single root-level repository so inter-module POM dependencies can be
+                // resolved exactly like they will be from a remote Maven repository.
+                // 本地 staging 仓库用于检查并消费最终 Maven 目录结构；之后可替换/扩展到远端仓库。
+                // 这里统一写入根目录仓库，确保模块间 POM 依赖能像远端 Maven 仓库一样被解析。
                 name = "localStaging"
-                url = uri(layout.buildDirectory.dir("repo").get().asFile)
+                url = uri(rootProject.layout.buildDirectory.dir("repo").get().asFile)
             }
             maven {
                 // First remote publishing target. GitHub Actions can publish with the built-in

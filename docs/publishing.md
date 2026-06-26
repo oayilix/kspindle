@@ -59,13 +59,51 @@ Before publishing remotely, run:
 ./gradlew publishAllPublicationsToLocalStagingRepository
 ```
 
-`publishToMavenLocal` verifies local Maven consumption.
+`publishToMavenLocal` publishes artifacts to Maven Local for inspection or manual consumption.
 
-`publishToMavenLocal` 用于验证本机 Maven 消费。
+`publishToMavenLocal` 会把产物发布到本机 Maven 仓库，便于检查或手动消费。
 
-`publishAllPublicationsToLocalStagingRepository` writes a Maven repository layout under each SDK module's `build/repo` directory, including JARs, source JARs, javadoc JARs, POM files, Gradle module metadata, and checksums.
+`publishAllPublicationsToLocalStagingRepository` writes a Maven repository layout under the root `build/repo` directory, including JARs, source JARs, javadoc JARs, POM files, Gradle module metadata, and checksums.
 
-`publishAllPublicationsToLocalStagingRepository` 会在各 SDK 模块的 `build/repo` 目录下生成 Maven 仓库结构，包括 JAR、源码包、javadoc 包、POM、Gradle metadata 和校验和。
+`publishAllPublicationsToLocalStagingRepository` 会在根目录 `build/repo` 下生成 Maven 仓库结构，包括 JAR、源码包、javadoc 包、POM、Gradle metadata 和校验和。
+
+To verify the sample against local staging artifacts instead of local project dependencies:
+
+如需让 sample 使用本地 staging 仓库里的 Maven 产物，而不是本地 project 依赖：
+
+```bash
+./gradlew publishAllPublicationsToLocalStagingRepository \
+  -PVERSION_NAME=0.5.0-SNAPSHOT
+
+GRADLE_USER_HOME="$(mktemp -d)" \
+./gradlew :sample:clean \
+  :sample-api:clean \
+  :sample-impl:clean \
+  :sample:assembleRelease \
+  :sample-impl:kspKotlin \
+  -PusePublishedKspindle=true \
+  -PkspindleVersion=0.5.0-SNAPSHOT \
+  -PkspindleRepositoryUrl="$PWD/build/repo" \
+  --refresh-dependencies \
+  --rerun-tasks
+```
+
+To verify against GitHub Packages directly:
+
+如需直接验证 GitHub Packages 上的产物：
+
+```bash
+GITHUB_ACTOR=<github-username> \
+GITHUB_PACKAGES_TOKEN=<github-token-with-read-packages> \
+GRADLE_USER_HOME="$(mktemp -d)" \
+./gradlew clean \
+  :sample:assembleRelease \
+  :sample-impl:kspKotlin \
+  -PusePublishedKspindle=true \
+  -PkspindleVersion=0.5.0-SNAPSHOT \
+  --refresh-dependencies \
+  --rerun-tasks
+```
 
 ## GitHub Packages publishing / 发布到 GitHub Packages
 

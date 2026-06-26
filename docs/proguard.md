@@ -23,49 +23,60 @@ unless the correct keep rules are applied:
 
 ## How the Rules Are Provided
 
-A `consumer-rules.pro` file is located at:
+The source rules live in:
 
 ```
 kspindle-runtime/consumer-rules.pro
 ```
 
-It contains all the `-keep` rules listed above, organized by concern with bilingual
-comments (English and Chinese).
+The published `kspindle-runtime` JAR packages the same rules at:
+
+```text
+META-INF/proguard/kspindle-runtime.pro
+```
+
+Android Gradle Plugin/R8 can consume this embedded file from the dependency JAR,
+so apps that depend on the published runtime artifact do not need to copy the
+rules manually. The source `consumer-rules.pro` remains in the repository for
+inspection, local project-dependency builds, and non-standard shrinker setups.
 
 ## How to Apply
 
 ### Android Projects
 
-If the KSPindle is published as an Android AAR with `consumerProguardFiles`,
-the `consumer-rules.pro` file is automatically merged into the consuming app's
-ProGuard/R8 configuration. When consuming the current JVM/JAR module directly,
-add the rules manually as shown below.
+When consuming the published `kspindle-runtime` Maven artifact, no extra
+configuration is normally required: the runtime JAR carries
+`META-INF/proguard/kspindle-runtime.pro`, and AGP/R8 merges it during Android
+release builds.
 
-### JVM Projects (JAR dependency)
+If you depend on local project modules instead of the published artifact, wire the
+repository source file explicitly, as the sample app does:
 
-For JVM libraries or applications distributed as JARs, manually reference the rules
-in your ProGuard/R8 configuration:
-
-**Option A -- In your build.gradle.kts (Android library project):**
 ```kotlin
 android {
     buildTypes {
         release {
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "consumer-rules.pro"   // copy from kspindle-runtime/consumer-rules.pro
+                "../kspindle-runtime/consumer-rules.pro",
+                "proguard-rules.pro"
             )
         }
     }
 }
 ```
 
-**Option B -- Direct ProGuard include:**
+### JVM Projects (JAR dependency)
+
+For non-Android JVM libraries or applications that run ProGuard manually,
+reference the rules explicitly:
+
+**Option A -- Direct ProGuard include:**
 ```pro
 -include /path/to/kspindle/consumer-rules.pro
 ```
 
-**Option C -- Copy rules into your own ProGuard configuration:**
+**Option B -- Copy rules into your own ProGuard configuration:**
 Open `kspindle-runtime/consumer-rules.pro` and copy the relevant `-keep` rules into your
 project's ProGuard configuration file.
 
@@ -80,13 +91,23 @@ are preserved:
 # For APK
 unzip -l app-release.apk | grep META-INF/services
 
-# For JAR
-jar tf kspindle-runtime-*.jar | grep META-INF/services
+# For a JVM implementation/consumer JAR that ran the KSP processor
+jar tf sample-impl-*.jar | grep META-INF/services
 ```
 
 Expected output:
 ```
 META-INF/services/io.github.oayilix.kspindle.runtime.ServiceIndexProvider
+```
+
+The `META-INF/services` file is generated in the module that applies KSP and
+declares service providers. It is not expected to be present in the
+`kspindle-runtime` JAR itself.
+
+### Check embedded runtime ProGuard rules are present
+
+```bash
+jar tf kspindle-runtime-*.jar | grep META-INF/proguard/kspindle-runtime.pro
 ```
 
 ### Check ServiceIndexProvider implementations are not obfuscated

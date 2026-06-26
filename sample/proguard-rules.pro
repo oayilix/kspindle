@@ -1,5 +1,6 @@
 # Sample app-specific shrinking rules.
 #
-# KSPindle rules are added from ../kspindle-runtime/consumer-rules.pro in
-# sample/build.gradle.kts so the sample release build exercises the same
-# runtime-discovery requirements as consumers.
+# In the default project-dependency mode, sample/build.gradle.kts adds KSPindle
+# rules from ../kspindle-runtime/consumer-rules.pro. In published-artifact mode,
+# the sample relies on the embedded META-INF/proguard rules from the runtime JAR.
+# Both paths exercise the same runtime-discovery requirements as consumers.

@@ -4,6 +4,13 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+val usePublishedKspindle = providers.gradleProperty("usePublishedKspindle")
+    .map(String::toBoolean)
+    .getOrElse(false)
+val kspindleVersion = providers.gradleProperty("kspindleVersion")
+    .orElse(providers.gradleProperty("VERSION_NAME"))
+    .get()
+
 android {
     namespace = "io.github.oayilix.kspindle.sample"
     compileSdk = 35
@@ -19,11 +26,18 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "../kspindle-runtime/consumer-rules.pro",
-                "proguard-rules.pro"
-            )
+            if (usePublishedKspindle) {
+                proguardFiles(
+                    getDefaultProguardFile("proguard-android-optimize.txt"),
+                    "proguard-rules.pro"
+                )
+            } else {
+                proguardFiles(
+                    getDefaultProguardFile("proguard-android-optimize.txt"),
+                    "../kspindle-runtime/consumer-rules.pro",
+                    "proguard-rules.pro"
+                )
+            }
         }
     }
 
@@ -48,8 +62,13 @@ dependencies {
     // sample-impl provides implementations — available only at runtime, never at compile time
     runtimeOnly(project(":sample-impl"))
 
-    implementation(project(":kspindle-runtime"))
-    ksp(project(":kspindle-compiler"))
+    if (usePublishedKspindle) {
+        implementation("io.github.oayilix:kspindle-runtime:$kspindleVersion")
+        ksp("io.github.oayilix:kspindle-compiler:$kspindleVersion")
+    } else {
+        implementation(project(":kspindle-runtime"))
+        ksp(project(":kspindle-compiler"))
+    }
 
     implementation(libs.androidx.core)
     implementation(libs.androidx.appcompat)
